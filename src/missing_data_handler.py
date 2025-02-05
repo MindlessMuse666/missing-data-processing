@@ -4,19 +4,19 @@ from sklearn.impute import KNNImputer
 from sklearn.linear_model import LinearRegression 
 from sklearn.preprocessing import LabelEncoder
 
-
+ 
 class MissingDataHandler:
     def __init__(self, df):
         self.df = df.copy()
-        
-        
+ 
+ 
     def calculate_missing_values(self):
         '''Подсчет количества пропущенных значений в каждом признаке'''
         missing_values = self.df.isnull().sum()
         
         return missing_values
 
-
+ 
     def drop_rows_with_missing_values(self):
         '''Удаление строк с пропущенными значениями'''
         initial_shape = self.df.shape
@@ -28,7 +28,7 @@ class MissingDataHandler:
         
         return self.df
 
-        
+ 
     def fill_missing_with_mean_median(self, column, method='mean'):
         '''Заполнение пропущенных значений средним или медианным значением'''
         initial_stats = self.df[column].describe()
@@ -40,15 +40,17 @@ class MissingDataHandler:
         else:
             raise ValueError('Неверный метод. Должен быть "mean" или "median"')
 
-        self.df[column].fillna(fill_value, inplace=True)
-        filled_stats = self.df[column].describe()
+        # Создаем копию датафрейма, чтобы избежать изменения исходного
+        filled_df = self.df.copy()
+        filled_df[column].fillna(fill_value, inplace=True)  # Заполняем пропуски в копии
+        filled_stats = filled_df[column].describe()
         
         print(f'Статистика до заполнения: \n{initial_stats}')
         print(f'Статистика после заполнения: \n{filled_stats}')
         
-        return self.df
-
-    
+        return filled_df  # Возвращаем копию датафрейма с заполненными значениями
+ 
+ 
     def interpolate_missing_values(self, column, method='linear', num_missing=50):
         '''Заполнение пропущенных значений методом интерполяции'''
         initial_data = self.df[column].copy()
@@ -59,16 +61,19 @@ class MissingDataHandler:
         self.df.loc[missing_indices, column] = initial_data.loc[missing_indices]
         
         return initial_data, interpolated_data
-
-      
+ 
+ 
     def knn_imputation(self, columns, n_neighbors=5):
         '''Заполнение пропущенных значений методом KNN'''
         imputer = KNNImputer(n_neighbors=n_neighbors)
-        self.df[columns] = imputer.fit_transform(self.df[columns])
         
-        return self.df
-
-
+        # Создаем копию датафрейма
+        knn_df = self.df.copy()
+        knn_df[columns] = imputer.fit_transform(knn_df[columns])  # Применяем KNN Imputation к копии
+        
+        return knn_df  # Возвращаем копию датафрейма с заполненными значениями
+ 
+ 
     def predict_missing_values_with_linear_regression(self, column, predictors):
         '''Предсказание пропущенных значений в столбце с использованием линейной регрессии.'''
         df_copy = self.df.copy()
@@ -87,7 +92,7 @@ class MissingDataHandler:
                 label_encoder = LabelEncoder()
                 train_df[predictor] = label_encoder.fit_transform(train_df[predictor].astype(str))
                 test_df[predictor] = label_encoder.transform(test_df[predictor].astype(str))
-
+ 
         scaler = StandardScaler()
         X_train = train_df[predictors].copy()
         X_test = test_df[predictors].copy()
@@ -110,5 +115,5 @@ class MissingDataHandler:
         self.df.loc[self.df[column].isnull(), column] = predicted_ages
 
         print(f'Предсказаны пропущенные значения в столбце "{column}" с использованием линейной регрессии.')
-
+ 
         return self.df

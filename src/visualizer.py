@@ -33,3 +33,39 @@ class Visualizer:
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+
+    def plot_comparison_of_distributions(self, original_data, imputed_data, original_label, imputed_label, title):
+        '''Сравнение распределений до и после заполнения пропусков'''
+        plt.figure(figsize=(12, 6), num=title)
+        sns.histplot(original_data, kde=True, label=original_label)
+        sns.histplot(imputed_data, kde=True, color='red', label=imputed_label)
+        plt.title(title, fontsize=14, y=1.02)
+        plt.xlabel('Значение')
+        plt.ylabel('Плотность')
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def plot_knn_imputation_results(self, original_df, knn_df):
+        '''Визуализация результатов KNN Imputation (scatter plot age vs fare до и после)'''
+        plt.figure(figsize=(14, 7), num='Результаты KNN Imputation')
+        
+        # График до KNN Imputation
+        plt.subplot(1, 2, 1)
+        plt.scatter(original_df['age'], original_df['fare'], alpha=0.5)
+        plt.title('Исходные данные (age vs fare)')
+        plt.xlabel('Age')
+        plt.ylabel('Fare')
+        plt.grid(True)
+
+        # График после KNN Imputation
+        plt.subplot(1, 2, 2)
+        plt.scatter(knn_df['age'], knn_df['fare'], alpha=0.5, color='green')
+        plt.title('После KNN Imputation (age vs fare)')
+        plt.xlabel('Age')
+        plt.ylabel('Fare')
+        plt.grid(True)
+
+        plt.tight_layout()
+        plt.show()
