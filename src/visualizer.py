@@ -34,11 +34,12 @@ class Visualizer:
         plt.tight_layout()
         plt.show()
 
+
     def plot_comparison_of_distributions(self, original_data, imputed_data, original_label, imputed_label, title):
         '''Сравнение распределений до и после заполнения пропусков'''
         plt.figure(figsize=(12, 6), num=title)
         sns.histplot(original_data, kde=True, label=original_label)
-        sns.histplot(imputed_data, kde=True, color='red', label=imputed_label)
+        sns.histplot(imputed_data, kde=True, color='purple', alpha=0.6, label=imputed_label)  # Изменены цвет и прозрачность
         plt.title(title, fontsize=14, y=1.02)
         plt.xlabel('Значение')
         plt.ylabel('Плотность')
@@ -46,6 +47,7 @@ class Visualizer:
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+
 
     def plot_knn_imputation_results(self, original_df, knn_df):
         '''Визуализация результатов KNN Imputation (scatter plot age vs fare до и после)'''
